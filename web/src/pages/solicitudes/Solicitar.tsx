@@ -1,8 +1,13 @@
-﻿export default function Solicitar() {
+﻿import { useParams } from 'react-router-dom'
+
+export default function Solicitar() {
+  const { id } = useParams()
   return (
-    <div className="p-6">
-      <h1 className="text-2xl font-bold">Solicitar servicio</h1>
-      <p className="text-gray-600">Página vacía: la reemplaza su dueño.</p>
+    <div className="mx-auto max-w-[1120px] px-6 py-12">
+      <h1 className="text-3xl font-bold text-primario">Solicitar servicio</h1>
+      <p className="mt-2 text-base text-stone-700">
+        Próximamente: el formulario de 5 pasos. Prestador: {id}
+      </p>
     </div>
   )
 }

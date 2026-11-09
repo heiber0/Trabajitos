@@ -350,6 +350,20 @@ export type Database = {
           total_valoraciones: number
         }[]
       }
+      resenas_prestador: {
+        Args: { p_prestador: string }
+        Returns: {
+          calidad: number
+          comentario: string
+          creado_en: string
+          id: string
+          nombre_cliente: string
+          precio: number
+          puntualidad: number
+          respuesta: string
+          trato: number
+        }[]
+      }
     }
     Enums: {
       [_ in never]: never
