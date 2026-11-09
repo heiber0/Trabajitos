@@ -1,23 +1,20 @@
 import { Navigate, Outlet, Route, Routes } from 'react-router-dom'
 import { useSesion, type Rol } from './lib/useSesion'
-
-import Inicio from './pages/Inicio'
+import Layout from './components/layout/Layout'
 import NoEncontrada from './pages/NoEncontrada'
-import Login from './pages/auth/Login'
-import Registro from './pages/auth/Registro'
-import Perfil from './pages/perfil/Perfil'
-import PrestadorPublico from './pages/perfil/PrestadorPublico'
-import Buscar from './pages/buscar/Buscar'
-import Solicitudes from './pages/solicitudes/Solicitudes'
-import Solicitar from './pages/solicitudes/Solicitar'
-import Admin from './pages/admin/Admin'
-import Valorar from './features/valoraciones/Valorar'
+import { Home } from './pages/Home'
+import { Explorar } from './pages/Explorar'
+import { PerfilPrestador } from './pages/PerfilPrestador'
+import { PanelCliente } from './pages/PanelCliente'
+import { PanelPrestador } from './pages/PanelPrestador'
+import { PanelAdmin } from './pages/PanelAdmin'
+import { Auth } from './pages/Auth'
 
 function RutaProtegida({ roles }: { roles?: Rol[] }) {
   const { usuario, rol, cargando } = useSesion()
 
-  if (cargando) return <p className="p-6">Cargando...</p>
-  if (!usuario) return <Navigate to="/login" replace />
+  if (cargando) return <p className="p-6 text-base">Cargando...</p>
+  if (!usuario) return <Navigate to="/auth" replace />
   if (roles && (!rol || !roles.includes(rol))) return <Navigate to="/" replace />
   return <Outlet />
 }
@@ -25,24 +22,29 @@ function RutaProtegida({ roles }: { roles?: Rol[] }) {
 export default function RutasApp() {
   return (
     <Routes>
-      <Route path="/" element={<Inicio />} />
-      <Route path="/login" element={<Login />} />
-      <Route path="/registro" element={<Registro />} />
-      <Route path="/prestador/:id" element={<PrestadorPublico />} />
+      <Route element={<Layout />}>
+        <Route path="/" element={<Home />} />
+        <Route path="/buscar" element={<Explorar />} />
+        <Route path="/prestador/:id" element={<PerfilPrestador />} />
+        <Route path="/auth" element={<Auth />} />
+        <Route path="/login" element={<Navigate to="/auth" replace />} />
+        <Route path="/registro" element={<Navigate to="/auth?modo=registro" replace />} />
 
-      <Route element={<RutaProtegida />}>
-        <Route path="/buscar" element={<Buscar />} />
-        <Route path="/solicitudes" element={<Solicitudes />} />
-        <Route path="/solicitar/:prestadorId" element={<Solicitar />} />
-        <Route path="/valorar/:solicitudId" element={<Valorar />} />
-        <Route path="/perfil" element={<Perfil />} />
+        <Route element={<RutaProtegida />}>
+          <Route path="/solicitar/:id" element={<PerfilPrestador />} />
+        </Route>
+        <Route element={<RutaProtegida roles={['cliente']} />}>
+          <Route path="/panel-cliente" element={<PanelCliente />} />
+        </Route>
+        <Route element={<RutaProtegida roles={['prestador']} />}>
+          <Route path="/panel-prestador" element={<PanelPrestador />} />
+        </Route>
+        <Route element={<RutaProtegida roles={['admin']} />}>
+          <Route path="/admin" element={<PanelAdmin />} />
+        </Route>
+
+        <Route path="*" element={<NoEncontrada />} />
       </Route>
-
-      <Route element={<RutaProtegida roles={['admin']} />}>
-        <Route path="/admin" element={<Admin />} />
-      </Route>
-
-      <Route path="*" element={<NoEncontrada />} />
     </Routes>
   )
 }

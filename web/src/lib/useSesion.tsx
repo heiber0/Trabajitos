@@ -44,7 +44,10 @@ export function SesionProvider({ children }: { children: ReactNode }) {
     return () => data.subscription.unsubscribe()
   }, [cargarRol])
 
-  const refrescar = useCallback(() => cargarRol(usuario?.id), [cargarRol, usuario?.id])
+    const refrescar = useCallback(async () => {
+    const { data } = await supabase.auth.getSession()
+    await cargarRol(data.session?.user.id)
+  }, [cargarRol])
   const cerrarSesion = useCallback(async () => {
     await supabase.auth.signOut()
   }, [])
