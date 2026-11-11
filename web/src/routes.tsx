@@ -10,6 +10,7 @@ import { PanelPrestador } from './pages/PanelPrestador'
 import { PanelAdmin } from './pages/PanelAdmin'
 import { Auth } from './pages/Auth'
 import Solicitar from './pages/solicitudes/Solicitar'
+import Valorar from './pages/Valorar'
 
 function RutaProtegida({ roles }: { roles?: Rol[] }) {
   const { usuario, rol, cargando } = useSesion()
@@ -34,6 +35,7 @@ export default function RutasApp() {
         <Route element={<RutaProtegida roles={['cliente']} />}>
           <Route path="/solicitar/:id" element={<Solicitar />} />
           <Route path="/panel-cliente" element={<PanelCliente />} />
+          <Route path="/valorar/:solicitudId" element={<Valorar />} />
         </Route>
         <Route element={<RutaProtegida roles={['prestador']} />}>
           <Route path="/panel-prestador" element={<PanelPrestador />} />

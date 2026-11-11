@@ -9,6 +9,7 @@ import { Aviso } from '../components/ui/Aviso'
 import { Estrellas } from '../components/ui/Estrellas'
 import { SelloVerificado } from '../components/ui/SelloVerificado'
 import { cargarPerfilPublico, type Resena } from '../features/perfil/api'
+import { BotonReportar } from '../features/valoraciones/BotonReportar'
 
 type Datos = Awaited<ReturnType<typeof cargarPerfilPublico>>
 type Criterio = 'puntualidad' | 'calidad' | 'precio' | 'trato'
@@ -234,6 +235,7 @@ export function PerfilPrestador() {
                           <p>{r.respuesta}</p>
                         </div>
                       )}
+                      {usuario && !esDueno && <BotonReportar valoracionId={r.id} />}
                     </li>
                   )
                 })}
