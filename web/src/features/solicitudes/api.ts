@@ -57,3 +57,31 @@ export async function cancelarSolicitud(id: string) {
     .eq('id', id)
   if (error) throw error
 }
+
+// Cambia el estado de una solicitud. El precio solo se envía al aceptar.
+export async function cambiarEstado(id: string, estado: EstadoSolicitud, precio?: number) {
+  const cambios: { estado: EstadoSolicitud; precio_acordado?: number } = { estado }
+  if (precio !== undefined) cambios.precio_acordado = precio
+
+  const { data, error } = await supabase
+    .from('solicitudes')
+    .update(cambios)
+    .eq('id', id)
+    .select('id')
+  if (error) throw error
+  // Si las reglas de seguridad no dejan actualizar, Supabase responde sin error y sin filas
+  if (!data || data.length === 0) throw new Error('No se pudo actualizar la solicitud')
+}
+
+export async function cargarResumenPrestador(userId: string) {
+  const { data, error } = await supabase
+    .from('prestadores')
+    .select('promedio, total_valoraciones')
+    .eq('perfil_id', userId)
+    .maybeSingle()
+  if (error) throw error
+  return {
+    promedio: Number(data?.promedio ?? 0),
+    total: data?.total_valoraciones ?? 0,
+  }
+}
