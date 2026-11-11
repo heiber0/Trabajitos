@@ -10,7 +10,9 @@ import {
   type Solicitud,
 } from '../features/solicitudes/api'
 import type { EstadoSolicitud } from '../features/solicitudes/estados'
+import { cargarValoradas } from '../features/valoraciones/api'
 import { formatoPesos } from '../lib/formato'
+import { useSesion } from '../lib/useSesion'
 
 type Filtro = 'todas' | 'activas' | 'finalizadas' | 'canceladas'
 
@@ -35,20 +37,25 @@ function fechaTexto(iso: string | null) {
 }
 
 export function PanelCliente() {
+  const { usuario } = useSesion()
+  const userId = usuario?.id
   const [lista, setLista] = useState<Solicitud[]>([])
+  const [valoradas, setValoradas] = useState<Set<string>>(new Set())
   const [estado, setEstado] = useState<'cargando' | 'listo' | 'error'>('cargando')
   const [filtro, setFiltro] = useState<Filtro>('todas')
   const [aviso, setAviso] = useState('')
 
   const recargar = useCallback(async () => {
+    if (!userId) return
     try {
-      const datos = await cargarMisSolicitudes()
+      const [datos, vals] = await Promise.all([cargarMisSolicitudes(), cargarValoradas(userId)])
       setLista(datos.filter((s) => s.rol_yo === 'cliente'))
+      setValoradas(vals)
       setEstado('listo')
     } catch {
       setEstado('error')
     }
-  }, [])
+  }, [userId])
 
   useEffect(() => {
     void recargar()
@@ -137,6 +144,14 @@ export function PanelCliente() {
                     Cancelar solicitud
                   </Boton>
                 )}
+                {s.estado === 'finalizada' &&
+                  (valoradas.has(s.id) ? (
+                    <p className="text-base font-semibold text-emerald-800">
+                      Ya valoraste este servicio
+                    </p>
+                  ) : (
+                    <BotonEnlace to={`/valorar/${s.id}`}>Valorar servicio</BotonEnlace>
+                  ))}
               </div>
             </Tarjeta>
           ))}

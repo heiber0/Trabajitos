@@ -4,19 +4,21 @@ import { BotonEnlace } from '../components/ui/Boton'
 import { FormPerfil } from '../features/perfil/FormPerfil'
 import { GaleriaFotos } from '../features/perfil/GaleriaFotos'
 import { BandejaPrestador } from '../features/solicitudes/BandejaPrestador'
+import { OpinionesPrestador } from '../features/valoraciones/OpinionesPrestador'
 
-type Pestana = 'solicitudes' | 'perfil'
+type Pestana = 'solicitudes' | 'opiniones' | 'perfil'
+
+const PESTANAS: { id: Pestana; etiqueta: string }[] = [
+  { id: 'solicitudes', etiqueta: 'Solicitudes' },
+  { id: 'opiniones', etiqueta: 'Opiniones' },
+  { id: 'perfil', etiqueta: 'Mi perfil' },
+]
 
 export function PanelPrestador() {
   const { usuario } = useSesion()
   const [pestana, setPestana] = useState<Pestana>('solicitudes')
 
   if (!usuario) return null
-
-  const clase = (activa: boolean) =>
-    `h-11 rounded-lg px-5 text-base font-semibold ${
-      activa ? 'bg-primario text-white' : 'bg-white text-stone-800 hover:bg-stone-100'
-    }`
 
   return (
     <div className="mx-auto max-w-[1120px] px-6 py-10">
@@ -28,28 +30,27 @@ export function PanelPrestador() {
       </div>
 
       <div role="tablist" aria-label="Secciones" className="mt-6 flex gap-2">
-        <button
-          role="tab"
-          aria-selected={pestana === 'solicitudes'}
-          onClick={() => setPestana('solicitudes')}
-          className={clase(pestana === 'solicitudes')}
-        >
-          Solicitudes
-        </button>
-        <button
-          role="tab"
-          aria-selected={pestana === 'perfil'}
-          onClick={() => setPestana('perfil')}
-          className={clase(pestana === 'perfil')}
-        >
-          Mi perfil
-        </button>
+        {PESTANAS.map((p) => (
+          <button
+            key={p.id}
+            role="tab"
+            aria-selected={pestana === p.id}
+            onClick={() => setPestana(p.id)}
+            className={`h-11 rounded-lg px-5 text-base font-semibold ${
+              pestana === p.id
+                ? 'bg-primario text-white'
+                : 'bg-white text-stone-800 hover:bg-stone-100'
+            }`}
+          >
+            {p.etiqueta}
+          </button>
+        ))}
       </div>
 
       <div className="mt-6">
-        {pestana === 'solicitudes' ? (
-          <BandejaPrestador userId={usuario.id} />
-        ) : (
+        {pestana === 'solicitudes' && <BandejaPrestador userId={usuario.id} />}
+        {pestana === 'opiniones' && <OpinionesPrestador userId={usuario.id} />}
+        {pestana === 'perfil' && (
           <div className="max-w-3xl space-y-6">
             <FormPerfil userId={usuario.id} />
             <GaleriaFotos userId={usuario.id} />

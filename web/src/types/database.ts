@@ -182,24 +182,34 @@ export type Database = {
           creado_en: string | null
           estado: string | null
           id: string
-          motivo: string | null
+          motivo: string
+          reportado_por: string | null
           valoracion_id: string | null
         }
         Insert: {
           creado_en?: string | null
           estado?: string | null
           id?: string
-          motivo?: string | null
+          motivo: string
+          reportado_por?: string | null
           valoracion_id?: string | null
         }
         Update: {
           creado_en?: string | null
           estado?: string | null
           id?: string
-          motivo?: string | null
+          motivo?: string
+          reportado_por?: string | null
           valoracion_id?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "reportes_reportado_por_fkey"
+            columns: ["reportado_por"]
+            isOneToOne: false
+            referencedRelation: "perfiles"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "reportes_valoracion_id_fkey"
             columns: ["valoracion_id"]
@@ -265,43 +275,43 @@ export type Database = {
       }
       valoraciones: {
         Row: {
-          calidad: number | null
+          calidad: number
           cliente_id: string
           comentario: string | null
           creado_en: string | null
           id: string
-          precio: number | null
+          precio: number
           prestador_id: string
-          puntualidad: number | null
+          puntualidad: number
           respuesta: string | null
           solicitud_id: string
-          trato: number | null
+          trato: number
         }
         Insert: {
-          calidad?: number | null
+          calidad: number
           cliente_id: string
           comentario?: string | null
           creado_en?: string | null
           id?: string
-          precio?: number | null
+          precio: number
           prestador_id: string
-          puntualidad?: number | null
+          puntualidad: number
           respuesta?: string | null
           solicitud_id: string
-          trato?: number | null
+          trato: number
         }
         Update: {
-          calidad?: number | null
+          calidad?: number
           cliente_id?: string
           comentario?: string | null
           creado_en?: string | null
           id?: string
-          precio?: number | null
+          precio?: number
           prestador_id?: string
-          puntualidad?: number | null
+          puntualidad?: number
           respuesta?: string | null
           solicitud_id?: string
-          trato?: number | null
+          trato?: number
         }
         Relationships: [
           {

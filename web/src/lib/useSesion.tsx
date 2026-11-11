@@ -1,5 +1,5 @@
 import {
-  createContext, useCallback, useContext, useEffect, useState,
+  createContext, useCallback, useContext, useEffect, useRef, useState,
   type ReactNode,
 } from 'react'
 import type { User } from '@supabase/supabase-js'
@@ -21,6 +21,7 @@ export function SesionProvider({ children }: { children: ReactNode }) {
   const [usuario, setUsuario] = useState<User | null>(null)
   const [rol, setRol] = useState<Rol | null>(null)
   const [cargando, setCargando] = useState(true)
+  const idActual = useRef<string | null>(null)
 
   const cargarRol = useCallback(async (id?: string) => {
     if (!id) {
@@ -34,20 +35,28 @@ export function SesionProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     const { data } = supabase.auth.onAuthStateChange((_evento, sesion) => {
-      setUsuario(sesion?.user ?? null)
-      if (sesion) setCargando(true)
+      const nuevo = sesion?.user ?? null
+      const nuevoId = nuevo?.id ?? null
+
+      // Misma persona (renovación de sesión o regreso a la pestaña): no se recarga nada
+      if (nuevoId !== null && nuevoId === idActual.current) return
+
+      idActual.current = nuevoId
+      setUsuario(nuevo)
+      if (nuevo) setCargando(true)
       // setTimeout evita bloquear a Supabase al hacer otra consulta dentro del callback
       setTimeout(() => {
-        cargarRol(sesion?.user.id).finally(() => setCargando(false))
+        cargarRol(nuevoId ?? undefined).finally(() => setCargando(false))
       }, 0)
     })
     return () => data.subscription.unsubscribe()
   }, [cargarRol])
 
-    const refrescar = useCallback(async () => {
+  const refrescar = useCallback(async () => {
     const { data } = await supabase.auth.getSession()
     await cargarRol(data.session?.user.id)
   }, [cargarRol])
+
   const cerrarSesion = useCallback(async () => {
     await supabase.auth.signOut()
   }, [])
