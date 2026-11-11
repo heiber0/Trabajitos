@@ -33,7 +33,7 @@ export function Boton({
       className={`${base} ${variantes[variante]} ${className}`}
     >
       {cargando && <Loader2 className="h-5 w-5 animate-spin" aria-hidden="true" />}
-      {children}
+      <span>{children}</span>
     </button>
   )
 }

@@ -31,10 +31,8 @@ export default function RutasApp() {
         <Route path="/login" element={<Navigate to="/auth" replace />} />
         <Route path="/registro" element={<Navigate to="/auth?modo=registro" replace />} />
 
-        <Route element={<RutaProtegida />}>
-          <Route path="/solicitar/:id" element={<Solicitar />} />
-        </Route>
         <Route element={<RutaProtegida roles={['cliente']} />}>
+          <Route path="/solicitar/:id" element={<Solicitar />} />
           <Route path="/panel-cliente" element={<PanelCliente />} />
         </Route>
         <Route element={<RutaProtegida roles={['prestador']} />}>

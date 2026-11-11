@@ -333,6 +333,23 @@ export type Database = {
     }
     Functions: {
       es_admin: { Args: never; Returns: boolean }
+      mis_solicitudes: {
+        Args: never
+        Returns: {
+          cliente_nombre: string
+          creado_en: string
+          descripcion: string
+          direccion: string
+          estado: string
+          fecha_programada: string
+          id: string
+          oficio: string
+          precio_acordado: number
+          prestador_id: string
+          prestador_nombre: string
+          rol_yo: string
+        }[]
+      }
       prestadores_cercanos: {
         Args: {
           p_lat: number
