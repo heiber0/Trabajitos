@@ -3,12 +3,13 @@ import { useSesion } from '../lib/useSesion'
 import { BotonEnlace } from '../components/ui/Boton'
 import { FormPerfil } from '../features/perfil/FormPerfil'
 import { GaleriaFotos } from '../features/perfil/GaleriaFotos'
+import { BandejaPrestador } from '../features/solicitudes/BandejaPrestador'
 
 type Pestana = 'solicitudes' | 'perfil'
 
 export function PanelPrestador() {
   const { usuario } = useSesion()
-  const [pestana, setPestana] = useState<Pestana>('perfil')
+  const [pestana, setPestana] = useState<Pestana>('solicitudes')
 
   if (!usuario) return null
 
@@ -45,16 +46,14 @@ export function PanelPrestador() {
         </button>
       </div>
 
-      <div className="mt-6 max-w-3xl space-y-6">
+      <div className="mt-6">
         {pestana === 'solicitudes' ? (
-          <p className="text-base text-stone-700">
-            Próximamente: aquí verás las solicitudes de tus clientes.
-          </p>
+          <BandejaPrestador userId={usuario.id} />
         ) : (
-          <>
+          <div className="max-w-3xl space-y-6">
             <FormPerfil userId={usuario.id} />
             <GaleriaFotos userId={usuario.id} />
-          </>
+          </div>
         )}
       </div>
     </div>
