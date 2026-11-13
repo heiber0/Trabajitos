@@ -5,6 +5,7 @@ import { ACEPTA_IMAGENES, esImagen, reducirImagen } from '../../lib/imagen'
 import { Boton } from '../../components/ui/Boton'
 import { Tarjeta } from '../../components/ui/Tarjeta'
 import { Aviso } from '../../components/ui/Aviso'
+import { DialogoConfirmacion } from '../../components/ui/Modal'
 import type { FotoTrabajo } from './api'
 
 const BUCKET = 'trabajos'
@@ -15,6 +16,8 @@ export function GaleriaFotos({ userId }: { userId: string }) {
   const [cargando, setCargando] = useState(true)
   const [subiendo, setSubiendo] = useState('')
   const [error, setError] = useState('')
+  const [fotoABorrar, setFotoABorrar] = useState<FotoTrabajo | null>(null)
+  const [borrando, setBorrando] = useState(false)
   const entrada = useRef<HTMLInputElement>(null)
 
   const recargar = useCallback(async () => {
@@ -44,7 +47,7 @@ export function GaleriaFotos({ userId }: { userId: string }) {
 
     for (let i = 0; i < lista.length; i++) {
       const archivo = lista[i]
-      setSubiendo(`Subiendo foto ${i + 1} de ${lista.length}...`)
+      setSubiendo(`Optimizando y subiendo foto ${i + 1} de ${lista.length}...`)
       try {
         if (!esImagen(archivo)) throw new Error('tipo')
         if (archivo.size > 25 * 1024 * 1024) throw new Error('tamano')
@@ -79,33 +82,37 @@ export function GaleriaFotos({ userId }: { userId: string }) {
     await recargar()
   }
 
-  async function borrar(foto: FotoTrabajo) {
-    if (!window.confirm('¿Eliminar esta foto?')) return
+  async function confirmarBorrado() {
+    if (!fotoABorrar) return
+    setBorrando(true)
     setError('')
-    const ruta = foto.url.split(`/${BUCKET}/`)[1]
+    const ruta = fotoABorrar.url.split(`/${BUCKET}/`)[1]
     if (ruta) {
       const { error: errStorage } = await supabase.storage.from(BUCKET).remove([ruta])
       if (errStorage) {
-        setError('No pudimos eliminar la foto. Intenta de nuevo.')
+        setError('No pudimos eliminar la foto del almacenamiento. Intenta de nuevo.')
+        setBorrando(false)
         return
       }
     }
-    const { error: errFila } = await supabase.from('fotos_trabajos').delete().eq('id', foto.id)
+    const { error: errFila } = await supabase.from('fotos_trabajos').delete().eq('id', fotoABorrar.id)
+    setBorrando(false)
+    setFotoABorrar(null)
     if (errFila) {
-      setError('No pudimos eliminar la foto. Intenta de nuevo.')
+      setError('No pudimos eliminar el registro de la foto. Intenta de nuevo.')
       return
     }
     await recargar()
   }
 
   return (
-    <Tarjeta>
-      <div className="space-y-4">
+    <Tarjeta className="p-6 sm:p-8">
+      <div className="space-y-6">
         <div>
           <h2 className="text-2xl font-bold text-primario">Fotos de mis trabajos</h2>
-          <p className="mt-1 text-base text-stone-700">
-            Muestra trabajos que hayas hecho. Hasta {MAX_FOTOS} fotos; las reducimos
-            automáticamente para que carguen rápido.
+          <p className="mt-1 text-base text-stone-600">
+            Muestra trabajos reales que hayas hecho. Hasta {MAX_FOTOS} fotos; las optimizamos
+            automáticamente para que carguen rápido y se vean nítidas.
           </p>
         </div>
 
@@ -120,42 +127,63 @@ export function GaleriaFotos({ userId }: { userId: string }) {
           className="hidden"
           onChange={(e) => void subir(e.target.files)}
         />
-        <Boton
-          variante="secundario"
-          disabled={!!subiendo || fotos.length >= MAX_FOTOS}
-          onClick={() => entrada.current?.click()}
-        >
-          <ImagePlus className="h-5 w-5" aria-hidden="true" />
-          Agregar fotos
-        </Boton>
+
+        <div>
+          <Boton
+            variante="secundario"
+            disabled={!!subiendo || fotos.length >= MAX_FOTOS}
+            onClick={() => entrada.current?.click()}
+          >
+            <ImagePlus className="h-5 w-5 text-accion" aria-hidden="true" />
+            <span>Agregar fotos de trabajos</span>
+          </Boton>
+        </div>
 
         {cargando ? (
-          <p className="text-base text-stone-700">Cargando fotos...</p>
+          <div className="py-8 text-center text-stone-500">
+            <p className="text-base font-medium">Cargando galería...</p>
+          </div>
         ) : fotos.length === 0 ? (
-          <p className="text-base text-stone-700">Aún no has subido fotos.</p>
+          <div className="rounded-2xl border border-dashed border-stone-200 bg-stone-50/50 p-8 text-center">
+            <p className="text-base text-stone-600 font-medium">Aún no has subido fotos a tu galería.</p>
+            <p className="text-sm text-stone-500 mt-1">Los prestadores con fotos reciben hasta 3 veces más contactos.</p>
+          </div>
         ) : (
-          <ul className="grid grid-cols-3 gap-4">
+          <ul className="grid grid-cols-2 sm:grid-cols-3 gap-4">
             {fotos.map((f) => (
-              <li key={f.id} className="relative overflow-hidden rounded-xl bg-stone-100">
+              <li key={f.id} className="group relative overflow-hidden rounded-2xl bg-stone-100 shadow-xs">
                 <img
                   src={f.url}
                   alt="Trabajo realizado"
                   loading="lazy"
-                  className="aspect-[4/3] w-full object-cover"
+                  className="aspect-[4/3] w-full object-cover transition-transform duration-300 group-hover:scale-105"
                 />
                 <button
                   type="button"
-                  onClick={() => void borrar(f)}
+                  onClick={() => setFotoABorrar(f)}
                   aria-label="Eliminar foto"
-                  className="absolute right-2 top-2 flex h-11 w-11 items-center justify-center rounded-full bg-white text-error shadow hover:bg-red-50"
+                  className="absolute right-2.5 top-2.5 flex h-10 w-10 items-center justify-center rounded-full bg-white/95 text-stone-700 shadow-md backdrop-blur-xs transition-colors hover:bg-red-50 hover:text-red-600"
                 >
-                  <Trash2 className="h-5 w-5" aria-hidden="true" />
+                  <Trash2 className="h-4 w-4" aria-hidden="true" />
                 </button>
               </li>
             ))}
           </ul>
         )}
       </div>
+
+      {/* Diálogo emergente para confirmar borrado */}
+      <DialogoConfirmacion
+        abierto={!!fotoABorrar}
+        alCerrar={() => setFotoABorrar(null)}
+        alConfirmar={confirmarBorrado}
+        titulo="¿Eliminar esta foto de tu galería?"
+        mensaje="Esta imagen dejará de mostrarse en tu perfil público de forma permanente."
+        textoConfirmar="Sí, eliminar foto"
+        textoCancelar="Conservar"
+        peligroso
+        cargando={borrando}
+      />
     </Tarjeta>
   )
 }

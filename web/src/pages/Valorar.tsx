@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
-import { useParams } from 'react-router-dom'
+import { useParams, Link } from 'react-router-dom'
+import { ChevronRight } from 'lucide-react'
 import { Aviso } from '../components/ui/Aviso'
 import { Boton, BotonEnlace } from '../components/ui/Boton'
 import { FormValoracion } from '../features/valoraciones/FormValoracion'
@@ -55,45 +56,63 @@ export default function Valorar() {
   )
 
   return (
-    <div className="mx-auto max-w-[640px] px-6 py-10">
-      {estado === 'cargando' && <p className="text-base text-stone-700">Cargando...</p>}
+    <div className="mx-auto w-[90%] py-10">
+      <div className="max-w-2xl mx-auto space-y-6">
+        <nav aria-label="Ruta" className="flex items-center gap-2 text-sm text-stone-500">
+          <Link to="/panel-cliente" className="hover:text-accion transition-colors">
+            Mis servicios
+          </Link>
+          <ChevronRight className="h-3.5 w-3.5" />
+          <span className="font-semibold text-stone-900">Calificar servicio</span>
+        </nav>
 
-      {estado === 'error' && (
-        <div className="space-y-4">
-          <Aviso tipo="error">No pudimos cargar el servicio. Revisa tu conexión.</Aviso>
-          <Boton onClick={() => setIntento((n) => n + 1)}>Reintentar</Boton>
-        </div>
-      )}
+        {estado === 'cargando' && (
+          <div className="py-20 text-center text-stone-500">
+            <p className="text-base font-medium">Cargando formulario de valoración...</p>
+          </div>
+        )}
 
-      {estado === 'no_encontrada' && (
-        <div className="space-y-4">
-          <h1 className="text-3xl font-bold text-primario">No encontramos este servicio</h1>
-          <p className="text-base text-stone-700">Solo puedes valorar tus propios servicios.</p>
-          {volver}
-        </div>
-      )}
+        {estado === 'error' && (
+          <div className="space-y-4 rounded-3xl border border-stone-200 bg-white p-8 text-center shadow-xs">
+            <Aviso tipo="error">No pudimos cargar los datos del servicio. Revisa tu conexión.</Aviso>
+            <div className="pt-2">
+              <Boton onClick={() => setIntento((n) => n + 1)}>Reintentar</Boton>
+            </div>
+          </div>
+        )}
 
-      {estado === 'no_finalizada' && (
-        <div className="space-y-4">
-          <h1 className="text-3xl font-bold text-primario">Aún no puedes valorarlo</h1>
-          <p className="text-base text-stone-700">
-            Este servicio todavía no está finalizado, por eso no puedes valorarlo.
-          </p>
-          {volver}
-        </div>
-      )}
+        {estado === 'no_encontrada' && (
+          <div className="space-y-4 rounded-3xl border border-stone-200 bg-white p-10 text-center shadow-xs">
+            <h1 className="text-2xl font-bold text-primario">No encontramos este servicio</h1>
+            <p className="text-base text-stone-600">Solo puedes valorar solicitudes de tu propia cuenta.</p>
+            <div className="pt-2">{volver}</div>
+          </div>
+        )}
 
-      {estado === 'ya_valorada' && (
-        <div className="space-y-4">
-          <h1 className="text-3xl font-bold text-primario">Ya valoraste este servicio</h1>
-          <p className="text-base text-stone-700">Cada servicio se valora una sola vez.</p>
-          {volver}
-        </div>
-      )}
+        {estado === 'no_finalizada' && (
+          <div className="space-y-4 rounded-3xl border border-stone-200 bg-white p-10 text-center shadow-xs">
+            <h1 className="text-2xl font-bold text-primario">Aún no puedes valorarlo</h1>
+            <p className="text-base text-stone-600">
+              Este trabajo todavía no ha sido marcado como finalizado por el prestador.
+            </p>
+            <div className="pt-2">{volver}</div>
+          </div>
+        )}
 
-      {estado === 'lista' && solicitud && userId && (
-        <FormValoracion solicitud={solicitud} clienteId={userId} />
-      )}
+        {estado === 'ya_valorada' && (
+          <div className="space-y-4 rounded-3xl border border-stone-200 bg-white p-10 text-center shadow-xs">
+            <h1 className="text-2xl font-bold text-primario">Ya valoraste este servicio</h1>
+            <p className="text-base text-stone-600">
+              Tu reseña ya fue registrada exitosamente y apoya a la comunidad de Trabajitos en Riohacha.
+            </p>
+            <div className="pt-2">{volver}</div>
+          </div>
+        )}
+
+        {estado === 'lista' && solicitud && userId && (
+          <FormValoracion solicitud={solicitud} clienteId={userId} />
+        )}
+      </div>
     </div>
   )
 }

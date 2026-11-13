@@ -17,8 +17,8 @@ export function Auth() {
   if (usuario && rol && !enFinal) return <Navigate to={rutaInicio(rol)} replace />
 
   return (
-    <div className="mx-auto max-w-[1120px] px-6 py-12">
-      <div className={`mx-auto ${registro ? 'max-w-[520px]' : 'max-w-[420px]'}`}>
+    <div className="mx-auto w-[90%] py-16 sm:py-20 flex items-center justify-center min-h-[calc(100vh-200px)]">
+      <div className={`w-full ${registro ? 'max-w-[540px]' : 'max-w-[460px]'}`}>
         {registro ? (
           <FormRegistro rolInicial={rolInicial} alTerminar={() => setEnFinal(true)} />
         ) : (

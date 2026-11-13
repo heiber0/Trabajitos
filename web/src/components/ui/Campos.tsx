@@ -9,7 +9,7 @@ import {
 type Comunes = { etiqueta: string; ayuda?: string; error?: string }
 
 const control =
-  'w-full rounded-xl border bg-white px-4 text-base text-stone-900 placeholder:text-stone-500 focus:border-accion'
+  'w-full rounded-2xl border bg-white px-4 text-base text-stone-900 placeholder:text-stone-400 transition-all outline-none focus:border-accion focus:ring-4 focus:ring-amber-500/15'
 
 function Envoltorio({
   id,
@@ -56,7 +56,7 @@ export function Campo({
         {...resto}
         aria-invalid={!!error}
         aria-describedby={descrito(id, ayuda, error)}
-        className={`${control} h-11 ${error ? 'border-error' : 'border-stone-300'} ${className}`}
+        className={`${control} h-12 ${error ? 'border-error focus:ring-red-500/15' : 'border-stone-300'} ${className}`}
       />
     </Envoltorio>
   )
@@ -78,7 +78,7 @@ export function CampoSelect({
         {...resto}
         aria-invalid={!!error}
         aria-describedby={descrito(id, ayuda, error)}
-        className={`${control} h-11 ${error ? 'border-error' : 'border-stone-300'} ${className}`}
+        className={`${control} h-12 ${error ? 'border-error focus:ring-red-500/15' : 'border-stone-300'} ${className}`}
       >
         {children}
       </select>
@@ -101,7 +101,7 @@ export function CampoTexto({
         {...resto}
         aria-invalid={!!error}
         aria-describedby={descrito(id, ayuda, error)}
-        className={`${control} min-h-28 py-3 ${error ? 'border-error' : 'border-stone-300'} ${className}`}
+        className={`${control} min-h-28 py-3 ${error ? 'border-error focus:ring-red-500/15' : 'border-stone-300'} ${className}`}
       />
     </Envoltorio>
   )
