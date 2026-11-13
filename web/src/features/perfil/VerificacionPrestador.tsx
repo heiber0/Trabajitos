@@ -1,13 +1,11 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { FileUp } from 'lucide-react'
 import { supabase } from '../../lib/supabase'
-import { reducirImagen } from '../../lib/imagen'
+import { ACEPTA_IMAGENES, esImagen, reducirImagen } from '../../lib/imagen'
 import { Boton } from '../../components/ui/Boton'
 import { Tarjeta } from '../../components/ui/Tarjeta'
 import { Aviso } from '../../components/ui/Aviso'
 import { mensajeError } from '../auth/mensajes'
-
-const TIPOS = ['image/jpeg', 'image/png', 'image/webp']
 
 type Estado = 'sin_enviar' | 'en_revision' | 'verificado' | 'rechazado'
 type Mensaje = { tipo: 'exito' | 'error'; texto: string } | null
@@ -46,12 +44,12 @@ export function VerificacionPrestador({ userId }: { userId: string }) {
     if (!archivo) return
     setMensaje(null)
 
-    if (!TIPOS.includes(archivo.type)) {
-      setMensaje({ tipo: 'error', texto: 'Usa una foto en formato JPG, PNG o WEBP.' })
+    if (!esImagen(archivo)) {
+      setMensaje({ tipo: 'error', texto: 'El archivo seleccionado debe ser una foto o imagen válida.' })
       return
     }
-    if (archivo.size > 15 * 1024 * 1024) {
-      setMensaje({ tipo: 'error', texto: 'La foto pesa demasiado. Usa una de menos de 15 MB.' })
+    if (archivo.size > 25 * 1024 * 1024) {
+      setMensaje({ tipo: 'error', texto: 'La foto pesa demasiado. Usa una de menos de 25 MB.' })
       return
     }
 
@@ -130,7 +128,7 @@ export function VerificacionPrestador({ userId }: { userId: string }) {
           <input
             ref={entrada}
             type="file"
-            accept={TIPOS.join(',')}
+            accept={ACEPTA_IMAGENES}
             className="hidden"
             onChange={(e) => void subir(e.target.files)}
           />

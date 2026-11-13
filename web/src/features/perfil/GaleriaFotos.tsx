@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { ImagePlus, Trash2 } from 'lucide-react'
 import { supabase } from '../../lib/supabase'
-import { reducirImagen } from '../../lib/imagen'
+import { ACEPTA_IMAGENES, esImagen, reducirImagen } from '../../lib/imagen'
 import { Boton } from '../../components/ui/Boton'
 import { Tarjeta } from '../../components/ui/Tarjeta'
 import { Aviso } from '../../components/ui/Aviso'
@@ -9,7 +9,6 @@ import type { FotoTrabajo } from './api'
 
 const BUCKET = 'trabajos'
 const MAX_FOTOS = 12
-const TIPOS = ['image/jpeg', 'image/png', 'image/webp']
 
 export function GaleriaFotos({ userId }: { userId: string }) {
   const [fotos, setFotos] = useState<FotoTrabajo[]>([])
@@ -47,8 +46,8 @@ export function GaleriaFotos({ userId }: { userId: string }) {
       const archivo = lista[i]
       setSubiendo(`Subiendo foto ${i + 1} de ${lista.length}...`)
       try {
-        if (!TIPOS.includes(archivo.type)) throw new Error('tipo')
-        if (archivo.size > 15 * 1024 * 1024) throw new Error('tamano')
+        if (!esImagen(archivo)) throw new Error('tipo')
+        if (archivo.size > 25 * 1024 * 1024) throw new Error('tamano')
         const blob = await reducirImagen(archivo)
         const ruta = `${userId}/${crypto.randomUUID()}.jpg`
 
@@ -73,7 +72,7 @@ export function GaleriaFotos({ userId }: { userId: string }) {
     setSubiendo('')
     if (fallidas.length > 0) {
       setError(
-        `No se pudieron subir: ${fallidas.join(', ')}. Usa fotos JPG, PNG o WEBP de menos de 15 MB.`,
+        `No se pudieron subir: ${fallidas.join(', ')}. Verifica que sean archivos de imagen válidos de menos de 25 MB.`,
       )
     }
     if (entrada.current) entrada.current.value = ''
@@ -116,7 +115,7 @@ export function GaleriaFotos({ userId }: { userId: string }) {
         <input
           ref={entrada}
           type="file"
-          accept={TIPOS.join(',')}
+          accept={ACEPTA_IMAGENES}
           multiple
           className="hidden"
           onChange={(e) => void subir(e.target.files)}

@@ -14,6 +14,7 @@ export function Navbar() {
   if (rol === 'cliente') enlaces.push({ to: '/panel-cliente', label: 'Mis servicios' })
   if (rol === 'prestador') enlaces.push({ to: '/panel-prestador', label: 'Mi panel' })
   if (rol === 'admin') enlaces.push({ to: '/admin', label: 'Administración' })
+  if (usuario) enlaces.push({ to: '/cuenta', label: 'Mi cuenta' })
 
   async function salir() {
     await cerrarSesion()
