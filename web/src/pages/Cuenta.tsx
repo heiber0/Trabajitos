@@ -10,10 +10,15 @@ export function Cuenta() {
   const correo = usuario.email ?? ''
 
   return (
-    <div className="mx-auto max-w-[1120px] px-6 py-10">
-      <h1 className="text-3xl font-bold text-primario">Mi cuenta</h1>
+    <div className="mx-auto w-[90%] py-10">
+      <div className="pb-6 border-b border-stone-200/80">
+        <h1 className="text-3xl sm:text-4xl font-extrabold text-primario tracking-tight">Mi cuenta</h1>
+        <p className="mt-1 text-base text-stone-600">
+          Gestiona tus datos personales, información de contacto y seguridad de acceso.
+        </p>
+      </div>
 
-      <div className="mt-6 max-w-3xl space-y-6">
+      <div className="mt-8 max-w-3xl space-y-8">
         <div className="flex flex-wrap gap-3">
           {rol === 'cliente' && (
             <>
@@ -43,10 +48,11 @@ export function Cuenta() {
         </div>
 
         {rol === 'prestador' && (
-          <p className="text-base text-stone-700">
-            Tu oficio, tarifa, ubicación, fotos y verificación se editan en Mi panel, pestaña Mi
-            perfil.
-          </p>
+          <div className="rounded-2xl bg-amber-50/80 border border-amber-200/60 p-4 text-base text-stone-700">
+            Tu oficio, tarifa, ubicación, fotos y verificación se editan en{' '}
+            <strong className="text-primario font-semibold">Mi panel</strong>, pestaña{' '}
+            <strong className="text-primario font-semibold">Mi perfil</strong>.
+          </div>
         )}
 
         <FormCuenta userId={usuario.id} correo={correo} />

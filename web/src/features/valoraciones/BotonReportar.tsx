@@ -1,7 +1,9 @@
 import { useState } from 'react'
+import { Flag } from 'lucide-react'
 import { Boton } from '../../components/ui/Boton'
 import { CampoTexto } from '../../components/ui/Campos'
 import { Aviso } from '../../components/ui/Aviso'
+import { Modal } from '../../components/ui/Modal'
 import { mensajeError } from '../auth/mensajes'
 import { codigoDe, reportarOpinion } from './api'
 
@@ -15,14 +17,10 @@ export function BotonReportar({ valoracionId }: { valoracionId: string }) {
   const [resultado, setResultado] = useState<Resultado | null>(null)
 
   if (resultado && resultado.tipo !== 'error') {
-    return <Aviso tipo={resultado.tipo}>{resultado.texto}</Aviso>
-  }
-
-  if (!abierto) {
     return (
-      <Boton variante="fantasma" onClick={() => setAbierto(true)}>
-        Reportar comentario
-      </Boton>
+      <div className="pt-1">
+        <Aviso tipo={resultado.tipo}>{resultado.texto}</Aviso>
+      </div>
     )
   }
 
@@ -37,15 +35,17 @@ export function BotonReportar({ valoracionId }: { valoracionId: string }) {
     setEnviando(true)
     try {
       await reportarOpinion(valoracionId, t)
+      setAbierto(false)
       setResultado({
         tipo: 'exito',
-        texto: 'Reporte enviado. Un administrador lo revisará.',
+        texto: 'Reporte enviado. Un administrador de Trabajitos revisará el comentario.',
       })
     } catch (err) {
       if (codigoDe(err) === '23505') {
-        setResultado({ tipo: 'info', texto: 'Ya habías reportado este comentario.' })
+        setAbierto(false)
+        setResultado({ tipo: 'info', texto: 'Ya habías reportado este comentario previamente.' })
       } else {
-        setResultado({ tipo: 'error', texto: mensajeError(err) })
+        setErrorMotivo(mensajeError(err))
       }
     } finally {
       setEnviando(false)
@@ -53,24 +53,55 @@ export function BotonReportar({ valoracionId }: { valoracionId: string }) {
   }
 
   return (
-    <div className="space-y-3 rounded-xl border border-stone-200 bg-stone-50 p-4">
-      {resultado?.tipo === 'error' && <Aviso tipo="error">{resultado.texto}</Aviso>}
-      <CampoTexto
-        etiqueta="¿Por qué reportas este comentario?"
-        ayuda="Entre 5 y 300 caracteres. Un administrador lo revisará."
-        maxLength={300}
-        value={motivo}
-        onChange={(e) => setMotivo(e.target.value)}
-        error={errorMotivo}
-      />
-      <div className="flex gap-3">
-        <Boton variante="secundario" disabled={enviando} onClick={() => setAbierto(false)}>
-          Cancelar
-        </Boton>
-        <Boton cargando={enviando} onClick={() => void enviar()}>
-          Enviar reporte
-        </Boton>
-      </div>
-    </div>
+    <>
+      <button
+        type="button"
+        onClick={() => setAbierto(true)}
+        className="inline-flex items-center gap-1.5 text-sm font-semibold text-stone-500 hover:text-red-600 transition-colors py-1"
+      >
+        <Flag className="h-3.5 w-3.5" />
+        <span>Reportar comentario</span>
+      </button>
+
+      <Modal
+        abierto={abierto}
+        alCerrar={() => {
+          if (!enviando) setAbierto(false)
+        }}
+        titulo="Reportar comentario"
+        descripcion="Si este comentario contiene lenguaje ofensivo, spam o datos falsos, avísanos."
+      >
+        <div className="space-y-4">
+          <CampoTexto
+            etiqueta="¿Por qué reportas este comentario?"
+            ayuda="Describe el motivo para que el equipo de moderación pueda evaluar el caso."
+            error={errorMotivo}
+            value={motivo}
+            onChange={(e) => setMotivo(e.target.value)}
+            placeholder="Ejemplo: Contiene ofensas personales o información que no corresponde con la realidad."
+            rows={4}
+          />
+
+          <div className="flex flex-col-reverse sm:flex-row justify-end gap-3 pt-2">
+            <Boton
+              type="button"
+              variante="secundario"
+              onClick={() => setAbierto(false)}
+              disabled={enviando}
+            >
+              Cancelar
+            </Boton>
+            <Boton
+              type="button"
+              variante="peligro"
+              onClick={() => void enviar()}
+              cargando={enviando}
+            >
+              Enviar reporte
+            </Boton>
+          </div>
+        </div>
+      </Modal>
+    </>
   )
 }
