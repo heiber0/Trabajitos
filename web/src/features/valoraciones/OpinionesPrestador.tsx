@@ -85,6 +85,16 @@ export function OpinionesPrestador({ userId }: { userId: string }) {
       {estado === 'listo' &&
         lista.map((o) => {
           const prom = (o.puntualidad + o.calidad + o.precio + o.trato) / 4
+          if (o.oculta) {
+            return (
+              <Tarjeta key={o.id} className="space-y-2">
+                <p className="text-base font-semibold text-stone-900">{o.nombre_cliente}</p>
+                <p className="text-base text-stone-700">
+                  Este comentario fue ocultado por moderación. La calificación sigue contando.
+                </p>
+              </Tarjeta>
+            )
+          }
           return (
             <Tarjeta key={o.id} className="space-y-4">
               <div className="flex items-center justify-between gap-4">

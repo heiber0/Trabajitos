@@ -125,40 +125,55 @@ export type Database = {
           anios_experiencia: number | null
           ciudad: string | null
           descripcion: string | null
+          documento_ruta: string | null
+          estado_verificacion: string
           lat: number | null
           lng: number | null
+          motivo_rechazo: string | null
           oficio_id: number | null
           perfil_id: string
           promedio: number | null
           tarifa_referencia: number | null
           total_valoraciones: number | null
           verificado: boolean | null
+          verificado_en: string | null
+          verificado_por: string | null
         }
         Insert: {
           anios_experiencia?: number | null
           ciudad?: string | null
           descripcion?: string | null
+          documento_ruta?: string | null
+          estado_verificacion?: string
           lat?: number | null
           lng?: number | null
+          motivo_rechazo?: string | null
           oficio_id?: number | null
           perfil_id: string
           promedio?: number | null
           tarifa_referencia?: number | null
           total_valoraciones?: number | null
           verificado?: boolean | null
+          verificado_en?: string | null
+          verificado_por?: string | null
         }
         Update: {
           anios_experiencia?: number | null
           ciudad?: string | null
           descripcion?: string | null
+          documento_ruta?: string | null
+          estado_verificacion?: string
           lat?: number | null
           lng?: number | null
+          motivo_rechazo?: string | null
           oficio_id?: number | null
           perfil_id?: string
           promedio?: number | null
           tarifa_referencia?: number | null
           total_valoraciones?: number | null
           verificado?: boolean | null
+          verificado_en?: string | null
+          verificado_por?: string | null
         }
         Relationships: [
           {
@@ -175,6 +190,13 @@ export type Database = {
             referencedRelation: "perfiles"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "prestadores_verificado_por_fkey"
+            columns: ["verificado_por"]
+            isOneToOne: false
+            referencedRelation: "perfiles"
+            referencedColumns: ["id"]
+          },
         ]
       }
       reportes: {
@@ -184,6 +206,9 @@ export type Database = {
           id: string
           motivo: string
           reportado_por: string | null
+          resolucion: string | null
+          resuelto_en: string | null
+          resuelto_por: string | null
           valoracion_id: string | null
         }
         Insert: {
@@ -192,6 +217,9 @@ export type Database = {
           id?: string
           motivo: string
           reportado_por?: string | null
+          resolucion?: string | null
+          resuelto_en?: string | null
+          resuelto_por?: string | null
           valoracion_id?: string | null
         }
         Update: {
@@ -200,12 +228,22 @@ export type Database = {
           id?: string
           motivo?: string
           reportado_por?: string | null
+          resolucion?: string | null
+          resuelto_en?: string | null
+          resuelto_por?: string | null
           valoracion_id?: string | null
         }
         Relationships: [
           {
             foreignKeyName: "reportes_reportado_por_fkey"
             columns: ["reportado_por"]
+            isOneToOne: false
+            referencedRelation: "perfiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "reportes_resuelto_por_fkey"
+            columns: ["resuelto_por"]
             isOneToOne: false
             referencedRelation: "perfiles"
             referencedColumns: ["id"]
@@ -280,6 +318,10 @@ export type Database = {
           comentario: string | null
           creado_en: string | null
           id: string
+          oculta: boolean
+          oculta_en: string | null
+          oculta_motivo: string | null
+          oculta_por: string | null
           precio: number
           prestador_id: string
           puntualidad: number
@@ -293,6 +335,10 @@ export type Database = {
           comentario?: string | null
           creado_en?: string | null
           id?: string
+          oculta?: boolean
+          oculta_en?: string | null
+          oculta_motivo?: string | null
+          oculta_por?: string | null
           precio: number
           prestador_id: string
           puntualidad: number
@@ -306,6 +352,10 @@ export type Database = {
           comentario?: string | null
           creado_en?: string | null
           id?: string
+          oculta?: boolean
+          oculta_en?: string | null
+          oculta_motivo?: string | null
+          oculta_por?: string | null
           precio?: number
           prestador_id?: string
           puntualidad?: number
@@ -317,6 +367,13 @@ export type Database = {
           {
             foreignKeyName: "valoraciones_cliente_id_fkey"
             columns: ["cliente_id"]
+            isOneToOne: false
+            referencedRelation: "perfiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "valoraciones_oculta_por_fkey"
+            columns: ["oculta_por"]
             isOneToOne: false
             referencedRelation: "perfiles"
             referencedColumns: ["id"]
@@ -342,6 +399,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      decidir_verificacion: {
+        Args: { p_aprobar: boolean; p_motivo?: string; p_prestador: string }
+        Returns: undefined
+      }
       es_admin: { Args: never; Returns: boolean }
       mis_solicitudes: {
         Args: never
@@ -360,6 +421,10 @@ export type Database = {
           rol_yo: string
         }[]
       }
+      moderar_reporte: {
+        Args: { p_accion: string; p_nota?: string; p_reporte: string }
+        Returns: undefined
+      }
       prestadores_cercanos: {
         Args: {
           p_lat: number
@@ -377,6 +442,42 @@ export type Database = {
           total_valoraciones: number
         }[]
       }
+      prestadores_por_verificar: {
+        Args: { p_estado?: string }
+        Returns: {
+          anios_experiencia: number
+          creado_en: string
+          descripcion: string
+          documento_ruta: string
+          estado_verificacion: string
+          motivo_rechazo: string
+          nombre: string
+          oficio: string
+          perfil_id: string
+          tarifa_referencia: number
+          telefono: string
+          tiene_ubicacion: boolean
+          verificado_en: string
+        }[]
+      }
+      reportes_para_revisar: {
+        Args: { p_estado?: string }
+        Returns: {
+          autor: string
+          comentario: string
+          creado_en: string
+          estado: string
+          motivo: string
+          oculta: boolean
+          prestador: string
+          reportante: string
+          reporte_id: string
+          resolucion: string
+          respuesta: string
+          resuelto_en: string
+          valoracion_id: string
+        }[]
+      }
       resenas_prestador: {
         Args: { p_prestador: string }
         Returns: {
@@ -385,6 +486,7 @@ export type Database = {
           creado_en: string
           id: string
           nombre_cliente: string
+          oculta: boolean
           precio: number
           puntualidad: number
           respuesta: string

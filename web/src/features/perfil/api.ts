@@ -31,6 +31,7 @@ export type Resena = {
   trato: number
   comentario: string | null
   respuesta: string | null
+  oculta: boolean
   creado_en: string
 }
 

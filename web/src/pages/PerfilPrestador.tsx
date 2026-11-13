@@ -226,8 +226,12 @@ export function PerfilPrestador() {
                         <Star className="h-5 w-5 fill-amber-500 text-amber-500" aria-hidden="true" />
                         {prom.toFixed(1)}
                       </p>
-                      {r.comentario && (
-                        <p className="text-base text-stone-800">{r.comentario}</p>
+                      {r.oculta ? (
+                        <p className="text-base italic text-stone-700">
+                          Este comentario fue ocultado por moderación.
+                        </p>
+                      ) : (
+                        r.comentario && <p className="text-base text-stone-800">{r.comentario}</p>
                       )}
                       {r.respuesta && (
                         <div className="rounded-xl bg-stone-100 p-4 text-base text-stone-800">
@@ -235,7 +239,7 @@ export function PerfilPrestador() {
                           <p>{r.respuesta}</p>
                         </div>
                       )}
-                      {usuario && !esDueno && <BotonReportar valoracionId={r.id} />}
+                      {usuario && !esDueno && !r.oculta && <BotonReportar valoracionId={r.id} />}
                     </li>
                   )
                 })}

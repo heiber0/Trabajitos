@@ -9,6 +9,7 @@ export type Calificacion = {
 
 export type Opinion = Calificacion & {
   id: string
+  oculta: boolean
   nombre_cliente: string
   comentario: string | null
   respuesta: string | null
