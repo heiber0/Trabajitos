@@ -14,6 +14,7 @@ import {
   type Solicitud,
 } from './api'
 import type { EstadoSolicitud } from './estados'
+import { ContactoSolicitud } from './ContactoSolicitud'
 
 type Filtro = 'nuevas' | 'activas' | 'finalizadas' | 'canceladas' | 'todas'
 type Mensaje = { tipo: 'exito' | 'error'; texto: string } | null
@@ -232,6 +233,7 @@ export function BandejaPrestador({ userId }: { userId: string }) {
                   Cliente: {s.cliente_nombre} · {s.direccion ?? 'Sin dirección'}
                 </p>
                 <p className="text-base text-stone-700">{fechaTexto(s.fecha_programada)}</p>
+                <ContactoSolicitud solicitudId={s.id} estado={s.estado} descripcion={s.descripcion} />
                 <p className="text-base text-stone-700">
                   Valor acordado:{' '}
                   <strong className="text-stone-900">

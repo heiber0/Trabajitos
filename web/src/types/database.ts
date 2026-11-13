@@ -399,6 +399,14 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      contacto_solicitud: {
+        Args: { p_solicitud: string }
+        Returns: {
+          nombre: string
+          telefono: string
+          whatsapp: string
+        }[]
+      }
       decidir_verificacion: {
         Args: { p_aprobar: boolean; p_motivo?: string; p_prestador: string }
         Returns: undefined
@@ -424,6 +432,21 @@ export type Database = {
       moderar_reporte: {
         Args: { p_accion: string; p_nota?: string; p_reporte: string }
         Returns: undefined
+      }
+      perfil_prestador_publico: {
+        Args: { p_id: string }
+        Returns: {
+          anios_experiencia: number
+          ciudad: string
+          descripcion: string
+          nombre: string
+          oficio: string
+          perfil_id: string
+          promedio: number
+          tarifa_referencia: number
+          total_valoraciones: number
+          verificado: boolean
+        }[]
       }
       prestadores_cercanos: {
         Args: {

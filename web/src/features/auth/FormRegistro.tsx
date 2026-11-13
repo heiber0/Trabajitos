@@ -307,7 +307,8 @@ export function FormRegistro({ rolInicial, alTerminar }: Props) {
             />
             <span>
               Autorizo el tratamiento de mis datos personales para usar Trabajitos, conforme
-              a la Ley 1581 de 2012.
+              a la Ley 1581 de 2012. Entiendo que mi nombre y celular se compartirán con la
+              otra persona cuando se acepte un servicio entre nosotros.
             </span>
           </label>
           {errores.consentimiento && (

@@ -10,6 +10,7 @@ import {
   type Solicitud,
 } from '../features/solicitudes/api'
 import type { EstadoSolicitud } from '../features/solicitudes/estados'
+import { ContactoSolicitud } from '../features/solicitudes/ContactoSolicitud'
 import { cargarValoradas } from '../features/valoraciones/api'
 import { formatoPesos } from '../lib/formato'
 import { useSesion } from '../lib/useSesion'
@@ -131,6 +132,7 @@ export function PanelCliente() {
                   {s.oficio && ` · ${s.oficio}`} · {s.direccion ?? 'Sin dirección'}
                 </p>
                 <p className="text-base text-stone-700">{fechaTexto(s.fecha_programada)}</p>
+                <ContactoSolicitud solicitudId={s.id} estado={s.estado} descripcion={s.descripcion} />
               </div>
               <div className="flex flex-col items-end gap-3">
                 <p className="text-base text-stone-700">
