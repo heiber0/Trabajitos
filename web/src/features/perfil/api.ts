@@ -2,11 +2,6 @@ import { supabase } from '../../lib/supabase'
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
 
-function uno<T>(valor: T | T[] | null | undefined): T | null {
-  if (Array.isArray(valor)) return valor[0] ?? null
-  return valor ?? null
-}
-
 export type PrestadorPublico = {
   perfil_id: string
   nombre: string
@@ -35,8 +30,10 @@ export type Resena = {
   creado_en: string
 }
 
-type Fila = {
+type FilaPrestador = {
   perfil_id: string
+  nombre: string | null
+  oficio: string | null
   descripcion: string | null
   anios_experiencia: number | null
   tarifa_referencia: number | null
@@ -44,21 +41,13 @@ type Fila = {
   verificado: boolean | null
   promedio: number | string | null
   total_valoraciones: number | null
-  oficios: { nombre: string } | { nombre: string }[] | null
-  perfiles: { nombre: string } | { nombre: string }[] | null
 }
 
 export async function cargarPerfilPublico(id: string) {
   if (!UUID.test(id)) return null
 
   const [pres, fotos, resenas] = await Promise.all([
-    supabase
-      .from('prestadores')
-      .select(
-        'perfil_id, descripcion, anios_experiencia, tarifa_referencia, ciudad, verificado, promedio, total_valoraciones, oficios(nombre), perfiles(nombre)',
-      )
-      .eq('perfil_id', id)
-      .maybeSingle(),
+    supabase.rpc('perfil_prestador_publico', { p_id: id }),
     supabase
       .from('fotos_trabajos')
       .select('id, url')
@@ -68,15 +57,16 @@ export async function cargarPerfilPublico(id: string) {
   ])
 
   if (pres.error) throw pres.error
-  if (!pres.data) return null
   if (fotos.error) throw fotos.error
   if (resenas.error) throw resenas.error
 
-  const fila = pres.data as unknown as Fila
+  const fila = ((pres.data ?? []) as unknown as FilaPrestador[])[0]
+  if (!fila) return null
+
   const prestador: PrestadorPublico = {
     perfil_id: fila.perfil_id,
-    nombre: uno(fila.perfiles)?.nombre ?? 'Prestador',
-    oficio: uno(fila.oficios)?.nombre ?? null,
+    nombre: fila.nombre ?? 'Prestador',
+    oficio: fila.oficio,
     descripcion: fila.descripcion,
     anios_experiencia: fila.anios_experiencia ?? 0,
     tarifa_referencia: fila.tarifa_referencia,
