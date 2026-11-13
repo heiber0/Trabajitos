@@ -5,6 +5,7 @@ import { FormPerfil } from '../features/perfil/FormPerfil'
 import { GaleriaFotos } from '../features/perfil/GaleriaFotos'
 import { BandejaPrestador } from '../features/solicitudes/BandejaPrestador'
 import { OpinionesPrestador } from '../features/valoraciones/OpinionesPrestador'
+import { VerificacionPrestador } from '../features/perfil/VerificacionPrestador'
 
 type Pestana = 'solicitudes' | 'opiniones' | 'perfil'
 
@@ -52,6 +53,7 @@ export function PanelPrestador() {
         {pestana === 'opiniones' && <OpinionesPrestador userId={usuario.id} />}
         {pestana === 'perfil' && (
           <div className="max-w-3xl space-y-6">
+            <VerificacionPrestador userId={usuario.id} />
             <FormPerfil userId={usuario.id} />
             <GaleriaFotos userId={usuario.id} />
           </div>
